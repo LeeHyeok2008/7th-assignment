@@ -45,7 +45,11 @@ class AppBuilder:
                 with gr.TabItem("수동 조작", id="manual_play") as tab_manual:
                     with gr.Column():
                         with gr.Column(scale=3):
-                            manual_play_canvas = gr.Image(label="수동 조작")
+                            manual_play_canvas = gr.Image(
+                                label="수동 조작",
+                                streaming=True,
+                                format="jpeg",
+                            )
 
                         with gr.Column(scale=3):
                             with gr.Row():
@@ -74,7 +78,11 @@ class AppBuilder:
                     manual_play_reset_btn = gr.Button("초기화")
 
                 with gr.TabItem("AI 조작", id="ai_play") as tab_ai:
-                    ai_play_canvas = gr.Image(label="AI 조작")
+                    ai_play_canvas = gr.Image(
+                        label="AI 조작",
+                        streaming=True,
+                        format="jpeg",
+                    )
 
                     with gr.Row():
                         with gr.Column(scale=2):
@@ -93,7 +101,11 @@ class AppBuilder:
                     ai_play_reset_btn = gr.Button("초기화")
 
                 with gr.TabItem("강화학습", id="reinforcement") as tab_reinforcement:
-                    reinforcement_canvas = gr.Image(label="강화학습")
+                    reinforcement_canvas = gr.Image(
+                        label="강화학습",
+                        streaming=True,
+                        format="jpeg",
+                    )
 
                     with gr.Row():
                         with gr.Column(scale=2):

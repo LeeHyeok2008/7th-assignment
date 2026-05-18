@@ -91,11 +91,12 @@ class GameEnvironment:
 
     def draw(self):
         canvas = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+
         self.player.draw(canvas)
         self.target.draw(canvas)
 
         background = Image.new("RGB", canvas.size, (255, 255, 255))
-        background.paste(canvas, mask=canvas.split()[3])
+        background.paste(canvas, mask=canvas.getchannel("A"))
 
-        return np.array(background, dtype=np.uint8)
+        return background
 
