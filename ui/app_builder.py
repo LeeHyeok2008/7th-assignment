@@ -168,7 +168,7 @@ class AppBuilder:
                     f"{env.time_limit - env.elapsed_time:.2f}"
                 )
 
-                overall_score = (env.parking_accuracy * 0.8 + (env.time_limit - env.elapsed_time)/env.time_limit * 0.2) * 100
+                overall_score = (env.get_accuracy() * 0.8 + (env.time_limit - env.elapsed_time)/env.time_limit * 0.2) * 100
 
                 overall_score_text = (
                     f"종합 점수: {overall_score:.0f}"
