@@ -36,7 +36,7 @@ class DQNAgent:
         self.batch_size = 64
         self.gamma = 0.95
         self.epsilon = 1.0
-        self.epsilon_min = 0.2
+        self.epsilon_min = 0.05
         self.epsilon_decay = 0.999
         self.loss = 0
 
