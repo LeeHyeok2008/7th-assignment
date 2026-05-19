@@ -1,4 +1,5 @@
 import torch
+torch.set_num_threads(1)
 
 from models.DQN import DQNAgent
 from scenes.manual_play import ManualPlay
