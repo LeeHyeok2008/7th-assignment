@@ -1,4 +1,4 @@
-import io
+from line_profiler import profile
 import math
 import random
 import numpy as np
@@ -12,7 +12,7 @@ class GameEnvironment:
         self.player = Player()
         self.target = Target()
 
-        self.reset_target()
+        self.reset()
 
         self.is_finished = False
         self.finish_type = "None"
@@ -24,7 +24,7 @@ class GameEnvironment:
         self.parking_time = 0.0
         self.parking_finish_time = 3.0
 
-    def reset_target(self):
+    def reset(self):
         margin = 100
         self.target = Target(
             x=random.uniform(margin, WIDTH - margin),

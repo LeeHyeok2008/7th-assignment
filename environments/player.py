@@ -1,5 +1,4 @@
 import math
-import numpy as np
 from config import *
 from PIL import Image, ImageDraw
 

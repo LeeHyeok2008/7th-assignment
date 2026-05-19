@@ -1,7 +1,5 @@
-import numpy as np
 from interfaces.scene import Scene
 from config import NUMBER_TO_ACTION
-from environments.game_environment import GameEnvironment
 
 class Reinforcement(Scene):
 
