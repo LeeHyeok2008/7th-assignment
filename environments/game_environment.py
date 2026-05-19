@@ -1,4 +1,3 @@
-from line_profiler import profile
 import math
 import random
 import numpy as np
