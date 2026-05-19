@@ -2,7 +2,6 @@ import math
 import random
 import numpy as np
 from config import *
-from PIL import Image
 from environments.player import Player
 from environments.target import Target
 
@@ -16,12 +15,12 @@ class GameEnvironment:
         self.is_finished = False
         self.finish_type = "None"
         self.elapsed_time = 0.0
-        self.time_limit = 15.0
+        self.time_limit = 30.0
 
         self.parking_accuracy = 0.0
         self.parking_limit = 0.7
         self.parking_time = 0.0
-        self.parking_finish_time = 3.0
+        self.parking_finish_time = 6.0
 
     def reset(self):
         margin = 100
@@ -88,14 +87,24 @@ class GameEnvironment:
 
         self.player.update(action)
 
-    def draw(self):
-        canvas = Image.new("RGBA", (WIDTH, HEIGHT), (0, 0, 0, 0))
+    def get_render_data(self):
+        return {
+            "player": {
+                "x": self.player.x,
+                "y": self.player.y,
+                "angle": self.player.angle
+            },
+            "target": {
+                "x": self.target.x,
+                "y": self.target.y,
+                "angle": self.target.angle
+            },
+            "status": {
+                "is_finished": self.is_finished,
+                "finish_type": self.finish_type,
+                "time": round(self.elapsed_time, 2),
+                "accuracy": round(self.parking_accuracy, 2)
+            }
+        }
 
-        self.player.draw(canvas)
-        self.target.draw(canvas)
-
-        background = Image.new("RGB", canvas.size, (255, 255, 255))
-        background.paste(canvas, mask=canvas.getchannel("A"))
-
-        return background
 

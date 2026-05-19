@@ -8,10 +8,11 @@ class Target:
         self.y = float(y)
         self.angle = angle
 
+    '''
     def draw(self, canvas):
         target_w, target_h = 80, 50
 
-        # 1. 주차선 레이어 생성
+        
         target_layer = Image.new("RGBA", (target_w, target_h), (*BLACK, 0))
         t_draw = ImageDraw.Draw(target_layer)
         t_draw.rectangle([0, 0, target_w - 1, target_h - 1], outline=(*GREEN, 255), width=2)
@@ -37,5 +38,6 @@ class Target:
         rotated_target = target_layer.rotate(-math.degrees(self.angle), expand=True)
         t_offset = (int(self.x - rotated_target.width / 2), int(self.y - rotated_target.height / 2))
         canvas.paste(rotated_target, t_offset, rotated_target)
+    '''
 
 

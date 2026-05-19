@@ -1,10 +1,8 @@
 import gradio as gr
-import numpy as np
 from scenes.manual_play import ManualPlay
 from scenes.ai_play import AIPlay
 from scenes.reinforcement import  Reinforcement
 from ui.clear_controller import ClearController
-from environments.game_environment import GameEnvironment
 from config import *
 
 class AppBuilder:
@@ -22,6 +20,10 @@ class AppBuilder:
 
     def build(self):
         with gr.Blocks(title="Parking Simulator") as demo:
+
+            # 서버와 통신할 보이지 않는 데이터 창구
+            state_data = gr.JSON(visible=False)
+
             gr.Markdown("# 주차 시뮬레이션")
             gr.Markdown(
                 """
@@ -43,25 +45,18 @@ class AppBuilder:
             with gr.Tabs():
 
                 with gr.TabItem("수동 조작", id="manual_play") as tab_manual:
-                    with gr.Column():
-                        with gr.Column(scale=3):
-                            manual_play_canvas = gr.Image(
-                                label="수동 조작",
-                                streaming=True,
-                                format="jpeg",
-                            )
+                    gr.HTML(MANUAL_HTML)
+                    with gr.Column(scale=3):
+                        with gr.Row():
+                            btn_up = gr.Button("↑", scale=1)
 
-                        with gr.Column(scale=3):
-                            with gr.Row():
-                                btn_up = gr.Button("↑", scale=1)
+                        with gr.Row():
+                            btn_left = gr.Button("←")
+                            btn_stop = gr.Button("정지")
+                            btn_right = gr.Button("→")
 
-                            with gr.Row():
-                                btn_left = gr.Button("←")
-                                btn_stop = gr.Button("정지")
-                                btn_right = gr.Button("→")
-
-                            with gr.Row():
-                                btn_down = gr.Button("↓")
+                        with gr.Row():
+                            btn_down = gr.Button("↓")
 
                     with gr.Row():
                         with gr.Column(scale=2):
@@ -78,12 +73,7 @@ class AppBuilder:
                     manual_play_reset_btn = gr.Button("초기화")
 
                 with gr.TabItem("AI 조작", id="ai_play") as tab_ai:
-                    ai_play_canvas = gr.Image(
-                        label="AI 조작",
-                        streaming=True,
-                        format="jpeg",
-                    )
-
+                    gr.HTML(AI_HTML)
                     with gr.Row():
                         with gr.Column(scale=2):
                             ai_play_text_timer = gr.Markdown("0.00/0.00")
@@ -101,12 +91,7 @@ class AppBuilder:
                     ai_play_reset_btn = gr.Button("초기화")
 
                 with gr.TabItem("강화학습", id="reinforcement") as tab_reinforcement:
-                    reinforcement_canvas = gr.Image(
-                        label="강화학습",
-                        streaming=True,
-                        format="jpeg",
-                    )
-
+                    gr.HTML(REINFORCEMENT_HTML)
                     with gr.Row():
                         with gr.Column(scale=2):
                             reinforcement_text_timer = gr.Markdown("0.00/0.00")
@@ -158,7 +143,7 @@ class AppBuilder:
                         gr.skip()
                     )
 
-                scene = game.update()
+                render_data = game.update()
                 env = game.env
 
                 timer_text = (
@@ -207,7 +192,7 @@ class AppBuilder:
                     if env.finish_type == "COLLISION":
                         grade_text = "장애물 충돌 (실패)"
                 return (
-                    scene,
+                    render_data,
                     timer_text,
                     parking_text,
                     score_text,
@@ -227,7 +212,7 @@ class AppBuilder:
                 ),
                 inputs=[active_tab],
                 outputs=[
-                    manual_play_canvas,
+                    state_data,
                     manual_play_text_timer,
                     manual_play_text_parking,
                     manual_play_text_score,
@@ -235,6 +220,14 @@ class AppBuilder:
                     manual_play_text_overall_score,
                     manual_play_text_grade
                 ]
+            ).then(
+                fn=None,
+                inputs=[state_data],
+                js="""
+                    (data) => {
+                         window.drawGame("manualCanvas", data);
+                    }
+                    """
             )
 
             main_timer.tick(
@@ -246,7 +239,7 @@ class AppBuilder:
                 ),
                 inputs=[active_tab],
                 outputs=[
-                    ai_play_canvas,
+                    state_data,
                     ai_play_text_timer,
                     ai_play_text_parking,
                     ai_play_text_score,
@@ -254,6 +247,14 @@ class AppBuilder:
                     ai_play_text_overall_score,
                     ai_play_text_grade
                 ]
+            ).then(
+                fn=None,
+                inputs=[state_data],
+                js="""
+                    (data) => {
+                         window.drawGame("aiCanvas", data);
+                    }
+                    """
             )
 
             main_timer.tick(
@@ -265,7 +266,7 @@ class AppBuilder:
                 ),
                 inputs=[active_tab],
                 outputs=[
-                    reinforcement_canvas,
+                    state_data,
                     reinforcement_text_timer,
                     reinforcement_text_parking,
                     reinforcement_text_score,
@@ -273,6 +274,14 @@ class AppBuilder:
                     reinforcement_text_overall_score,
                     reinforcement_text_grade
                 ]
+            ).then(
+                fn=None,
+                inputs=[state_data],
+                js="""
+                    (data) => {
+                         window.drawGame("reinforcementCanvas",data);
+                    }
+                    """
             )
 
             def update_reinforcement_info(current_tab):

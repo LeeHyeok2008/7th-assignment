@@ -36,7 +36,7 @@ class Reinforcement(Scene):
                     self.reset()
                     break
 
-        return self.env.draw()
+        return self.env.get_render_data()
 
     def calculate_reward(self, cur_state, next_state):
         # 시간 효율성 패널티

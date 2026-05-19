@@ -11,7 +11,7 @@ class ManualPlay(Scene):
         if not self.paused:
             self.env.update((self.drive, self.turn))
 
-        return self.env.draw()
+        return self.env.get_render_data()
 
     def control(self, action):
         if action == 'ArrowUp':

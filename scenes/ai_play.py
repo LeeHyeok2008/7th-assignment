@@ -12,4 +12,4 @@ class AIPlay(Scene):
             action = self.agent.act(state, train=False)
             self.env.update(NUMBER_TO_ACTION[action])
 
-        return self.env.draw()
+        return self.env.get_render_data()
