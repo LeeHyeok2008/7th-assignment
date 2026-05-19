@@ -1,4 +1,5 @@
 import gradio as gr
+from interfaces.scene import Scene
 from scenes.manual_play import ManualPlay
 from scenes.ai_play import AIPlay
 from scenes.reinforcement import  Reinforcement
@@ -23,6 +24,7 @@ class AppBuilder:
 
             # 서버와 통신할 보이지 않는 데이터 창구
             state_data = gr.JSON(visible=False)
+            active_tab = gr.State("manual_play")
 
             gr.Markdown("# 주차 시뮬레이션")
             gr.Markdown(
@@ -39,8 +41,6 @@ class AppBuilder:
                 C: 0 ~ 69
                 """
             )
-
-            active_tab = gr.State("manual_play")
 
             with gr.Tabs():
 
@@ -130,86 +130,34 @@ class AppBuilder:
                 outputs=active_tab
             )
 
-
             def update_game(current_tab, target_tab, game):
                 if current_tab != target_tab:
-                    return (
-                        gr.skip(),
-                        gr.skip(),
-                        gr.skip(),
-                        gr.skip(),
-                        gr.skip(),
-                        gr.skip(),
-                        gr.skip()
-                    )
-
+                    return (gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip(), gr.skip())
                 render_data = game.update()
                 env = game.env
-
-                timer_text = (
-                    f"현재 시간: "
-                    f"{env.elapsed_time:.2f} / {env.time_limit:.2f}"
-                )
-
-                parking_text = (
-                    f"주차 중..."
-                    f"({env.parking_time:.2f} / "
-                    f"{env.parking_finish_time:.2f})"
-                    if env.parking_time >= 0.02
-                    else "주행 중..."
-                )
-
-                score_text = (
-                    f"점수: {env.get_accuracy() * 100:.0f}%"
-                )
-
-                left_time_text = (
-                    f"남은 시간: "
-                    f"{env.time_limit - env.elapsed_time:.2f}"
-                )
-
-                overall_score = (env.get_accuracy() * 0.8 + (env.time_limit - env.elapsed_time)/env.time_limit * 0.2) * 100
-
-                overall_score_text = (
-                    f"종합 점수: {overall_score:.0f}"
-                    if env.is_finished
-                    else "종합 점수: N/A"
-                )
-
+                timer_text = (f"현재 시간: " f"{env.elapsed_time:.2f} / {env.time_limit:.2f}")
+                parking_text = (f"주차 중..." f"({env.parking_time:.2f} / " f"{env.parking_finish_time:.2f})" if env.parking_time >= 0.02 else "주행 중...")
+                score_text = (f"점수: {env.get_accuracy() * 100:.0f}%")
+                left_time_text = (f"남은 시간: " f"{env.time_limit - env.elapsed_time:.2f}")
+                overall_score = (env.get_accuracy() * 0.8 + (
+                env.time_limit - env.elapsed_time) / env.time_limit * 0.2) * 100
+                overall_score_text = (f"종합 점수: {overall_score:.0f}" if env.is_finished else "종합 점수: N/A")
                 grade_color = BLACK
                 grade = "N/A"
                 if overall_score >= 90: grade_color = YELLOW; grade = "S"
                 elif overall_score >= 80: grade_color = RED; grade = "A"
                 elif overall_score >= 70: grade_color = BLUE; grade = "B"
                 else: grade_color = GREEN; grade = "C"
-
                 grade_text = "등급: N/A"
                 if env.is_finished:
-                    if env.finish_type == "SUCCESS":
-                        grade_text = f"등급: {grade}"
-                    if env.finish_type == "TIME_OVER":
-                        grade_text = "시간 초과 (실패)"
-                    if env.finish_type == "COLLISION":
-                        grade_text = "장애물 충돌 (실패)"
-                return (
-                    render_data,
-                    timer_text,
-                    parking_text,
-                    score_text,
-                    left_time_text,
-                    overall_score_text,
-                    grade_text,
-                )
+                    if env.finish_type == "SUCCESS": grade_text = f"등급: {grade}"
+                    if env.finish_type == "TIME_OVER": grade_text = "시간 초과 (실패)"
+                    if env.finish_type == "COLLISION": grade_text = "장애물 충돌 (실패)"
+                return (render_data, timer_text, parking_text, score_text, left_time_text, overall_score_text, grade_text,)
 
             main_timer = gr.Timer(1.0 / FPS)
-
             main_timer.tick(
-                fn=lambda current_tab:
-                update_game(
-                    current_tab,
-                    "manual_play",
-                    self.manual_play
-                ),
+                fn=lambda current_tab: update_game(current_tab, "manual_play", self.manual_play),
                 inputs=[active_tab],
                 outputs=[
                     state_data,
@@ -223,20 +171,15 @@ class AppBuilder:
             ).then(
                 fn=None,
                 inputs=[state_data],
-                js="""
-                    (data) => {
-                         window.drawGame("manualCanvas", data);
-                    }
+                js=""" 
+                    (data) => { 
+                        window.drawGame("manualCanvas", data); 
+                    } 
                     """
             )
 
             main_timer.tick(
-                fn=lambda current_tab:
-                update_game(
-                    current_tab,
-                    "ai_play",
-                    self.ai_play
-                ),
+                fn=lambda current_tab: update_game(current_tab, "ai_play", self.ai_play),
                 inputs=[active_tab],
                 outputs=[
                     state_data,
@@ -250,20 +193,15 @@ class AppBuilder:
             ).then(
                 fn=None,
                 inputs=[state_data],
-                js="""
-                    (data) => {
-                         window.drawGame("aiCanvas", data);
-                    }
+                js=""" 
+                    (data) => { 
+                        window.drawGame("aiCanvas", data); 
+                    } 
                     """
             )
 
             main_timer.tick(
-                fn=lambda current_tab:
-                update_game(
-                    current_tab,
-                    "reinforcement",
-                    self.reinforcement
-                ),
+                fn=lambda current_tab: update_game(current_tab, "reinforcement", self.reinforcement),
                 inputs=[active_tab],
                 outputs=[
                     state_data,
@@ -277,29 +215,20 @@ class AppBuilder:
             ).then(
                 fn=None,
                 inputs=[state_data],
-                js="""
-                    (data) => {
-                         window.drawGame("reinforcementCanvas",data);
-                    }
+                js=""" 
+                    (data) => { 
+                        window.drawGame("reinforcementCanvas",data); 
+                    } 
                     """
             )
 
             def update_reinforcement_info(current_tab):
                 if current_tab != "reinforcement":
-                    return (
-                        gr.skip(),
-                        gr.skip(),
-                        gr.skip(),
-                    )
+                    return (gr.skip(), gr.skip(), gr.skip(),)
                 episode_text = f"시행 {self.reinforcement.episode}"
                 epsilon_text = f"ε = {self.reinforcement.agent.epsilon * 100:.2f}%"
                 reward_text = f"보상 = {self.reinforcement.total_reward:.2f}"
-
-                return (
-                    episode_text,
-                    epsilon_text,
-                    reward_text
-                )
+                return (episode_text, epsilon_text, reward_text)
 
             main_timer.tick(
                 fn=update_reinforcement_info,
