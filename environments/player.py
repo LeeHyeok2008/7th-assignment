@@ -1,6 +1,5 @@
 import math
 from config import *
-from PIL import Image, ImageDraw
 
 class Player:
     def __init__(self, x=WIDTH/2, y=HEIGHT/2, angle=0.0, speed=100.0, angular_speed=1.92):
