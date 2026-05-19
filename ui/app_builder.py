@@ -378,6 +378,6 @@ class AppBuilder:
                 inputs=None
             )
 
-        demo.queue(default_concurrency_limit=10)
+        demo.queue(default_concurrency_limit=2)
 
         return demo
